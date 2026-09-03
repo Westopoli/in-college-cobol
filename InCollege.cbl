@@ -1,0 +1,25 @@
+COBOL
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. IN-COLLEGE.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT INPUT-FILE ASSIGN TO "InCollege-Input.txt"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+
+       WORKING-STORAGE SECTION.
+
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+
+
+
+       WRITE-OUTPUT.
+           
+
+           STOP RUN.
