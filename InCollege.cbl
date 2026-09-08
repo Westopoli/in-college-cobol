@@ -129,22 +129,22 @@
            PERFORM UNTIL LOGIN-FLAG = 1
                STRING "Please enter your username:" 
                    DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT.
-               PERFORM READ-INPUT.
-               MOVE IN-LINE TO USERNAME.
+               PERFORM WRITE-OUTPUT
+               PERFORM READ-INPUT
+               MOVE IN-LINE TO USERNAME
 
                IF USERNAME = "logout"
                    MOVE 0 TO SESSION-FLAG
                    EXIT PARAGRAPH
-               END-IF.
+               END-IF
 
                STRING "Please enter your password:" 
                    DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT.
-               PERFORM READ-INPUT.
-               MOVE IN-LINE TO PASSWORD.
+               PERFORM WRITE-OUTPUT
+               PERFORM READ-INPUT
+               MOVE IN-LINE TO PASSWORD
 
-               PERFORM FIND-USERNAME.
+               PERFORM FIND-USERNAME
                IF FOUND-FLAG = 1 AND FOUND-PASSWORD = PASSWORD
                    STRING "You have successfully logged in."
                        DELIMITED BY SIZE INTO OUT-LINE
