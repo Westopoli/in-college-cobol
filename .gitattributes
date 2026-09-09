@@ -1,0 +1,3 @@
+inputs/*.txt text eol=lf
+expected/*.txt text eol=lf
+*.cob text eol=lf
