@@ -7,7 +7,8 @@
            SELECT INPUT-FILE ASSIGN TO "InCollege-Input.txt"
                ORGANIZATION IS LINE SEQUENTIAL.
            SELECT ACCOUNTS-FILE ASSIGN TO "accounts.txt"
-               ORGANIZATION IS LINE SEQUENTIAL.
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS ACC-STATUS.
            SELECT OUTPUT-FILE ASSIGN TO "InCollege-Output.txt"
                ORGANIZATION IS LINE SEQUENTIAL.
 
@@ -25,7 +26,7 @@
        01 OUTPUT-RECORD PIC X(100).
 
        WORKING-STORAGE SECTION.
-       01 OUT-LINE PIC X(100).
+       01 OUT-LINE PIC X(100) VALUE SPACES.
        01 IN-LINE PIC X(100).
        01 USERNAME PIC X(20).
        01 PASSWORD PIC X(20).
@@ -38,6 +39,7 @@
        01 SKILL-FLAG PIC 9 VALUE 0.
        01 LOGIN-FLAG PIC 9 VALUE 0.
        01 EOF-FLAG PIC 9 VALUE 0.
+       01 ACC-STATUS PIC XX VALUE "00".
        01 PASS-LENGTH PIC 99.
        01 HAS-CAPITAL PIC 9 VALUE 0.
        01 HAS-DIGIT PIC 9 VALUE 0.
@@ -80,6 +82,10 @@
                        PERFORM LOGIN
                    WHEN "2"
                        PERFORM CREATE-ACCOUNT
+                   WHEN OTHER
+                       IF IN-LINE = "logout"
+                           MOVE 0 TO SESSION-FLAG
+                       END-IF
                END-EVALUATE
            END-PERFORM.
 
@@ -255,6 +261,9 @@
            MOVE 0 TO ACCOUNT-COUNT.
            MOVE 0 TO EOF-FLAG.
            OPEN INPUT ACCOUNTS-FILE.
+           IF ACC-STATUS NOT = "00"
+               EXIT PARAGRAPH
+           END-IF.
            PERFORM UNTIL EOF-FLAG = 1
                READ ACCOUNTS-FILE
                    AT END MOVE 1 TO EOF-FLAG
@@ -268,6 +277,9 @@
            MOVE SPACES TO FOUND-PASSWORD.
            MOVE 0 TO EOF-FLAG.
            OPEN INPUT ACCOUNTS-FILE.
+           IF ACC-STATUS NOT = "00"
+               EXIT PARAGRAPH
+           END-IF.
            PERFORM UNTIL EOF-FLAG = 1
                READ ACCOUNTS-FILE
                    AT END MOVE 1 TO EOF-FLAG
@@ -319,6 +331,9 @@
 
        SAVE-ACCOUNT.
            OPEN EXTEND ACCOUNTS-FILE.
+           IF ACC-STATUS NOT = "00"
+               OPEN OUTPUT ACCOUNTS-FILE
+           END-IF.
            MOVE USERNAME TO ACCOUNT-USERNAME.
            MOVE PASSWORD TO ACCOUNT-PASSWORD.
            WRITE ACCOUNT-RECORD.
@@ -328,14 +343,15 @@
            READ INPUT-FILE
                AT END
                    CLOSE INPUT-FILE
-                   CLOSE ACCOUNTS-FILE
                    CLOSE OUTPUT-FILE
                    STOP RUN
                NOT AT END
                    MOVE INPUT-RECORD TO IN-LINE
+                   MOVE IN-LINE TO OUT-LINE
                    PERFORM WRITE-OUTPUT
            END-READ.
 
        WRITE-OUTPUT.
-           DISPLAY OUT-LINE.
+           DISPLAY FUNCTION TRIM(OUT-LINE TRAILING).
            WRITE OUTPUT-RECORD FROM OUT-LINE.
+           MOVE SPACES TO OUT-LINE.
