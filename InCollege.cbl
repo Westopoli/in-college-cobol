@@ -133,7 +133,7 @@
        LOGIN.
            MOVE 0 TO LOGIN-FLAG.
            PERFORM UNTIL LOGIN-FLAG = 1
-               STRING "Please enter your username:" 
+               STRING "Please enter your username:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
                PERFORM READ-INPUT
@@ -144,7 +144,7 @@
                    EXIT PARAGRAPH
                END-IF
 
-               STRING "Please enter your password:" 
+               STRING "Please enter your password:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
                PERFORM READ-INPUT
@@ -155,16 +155,19 @@
                    STRING "You have successfully logged in."
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM WRITE-OUTPUT
-                   
+
                    STRING "Welcome, " FUNCTION TRIM(USERNAME) "!"
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM WRITE-OUTPUT
-                   
+
                    MOVE 1 TO LOGIN-FLAG
                    PERFORM POST-LOGIN-MENU
                ELSE
-                   STRING "Incorrect username/password, try again."
-                       DELIMITED BY SIZE INTO OUT-LINE
+                   STRING "Incorrect username/password, "
+                       DELIMITED BY SIZE
+                       "please try again"
+                       DELIMITED BY SIZE
+                       INTO OUT-LINE
                    PERFORM WRITE-OUTPUT
                END-IF
            END-PERFORM.
@@ -172,81 +175,89 @@
        POST-LOGIN-MENU.
            MOVE 1 TO SESSION-FLAG.
            PERFORM UNTIL SESSION-FLAG = 0
-               STRING "1) Jobs" 
+               STRING "1. Search for a job"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "2) Find" 
+
+               STRING "2. Find someone you know"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "3) Skills" 
+
+               STRING "3. Learn a new skill"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "Enter your choice (or logout):" 
+
+               STRING "4. Log out"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
+
+               STRING "Enter your choice:"
+                   DELIMITED BY SIZE INTO OUT-LINE
+               PERFORM WRITE-OUTPUT
+
                PERFORM READ-INPUT
                MOVE IN-LINE TO CHOICE
-               
+
                EVALUATE CHOICE
                    WHEN "1"
-                       STRING "Jobs feature is under construction."
-                           DELIMITED BY SIZE INTO OUT-LINE
+                       STRING "Job search/internship is under "
+                           DELIMITED BY SIZE
+                           "construction."
+                           DELIMITED BY SIZE
+                           INTO OUT-LINE
                        PERFORM WRITE-OUTPUT
                    WHEN "2"
-                       STRING "Find feature is under construction."
-                           DELIMITED BY SIZE INTO OUT-LINE
+                       STRING "Find someone you know is under "
+                           DELIMITED BY SIZE
+                           "construction."
+                           DELIMITED BY SIZE
+                           INTO OUT-LINE
                        PERFORM WRITE-OUTPUT
                    WHEN "3"
                        PERFORM SKILL-MENU
-                   WHEN OTHER
-                       IF IN-LINE = "logout"
-                           MOVE 0 TO SESSION-FLAG
-                       END-IF
+                   WHEN "4"
+                       MOVE 0 TO SESSION-FLAG
                END-EVALUATE
            END-PERFORM.
 
        SKILL-MENU.
            MOVE 1 TO SKILL-FLAG.
            PERFORM UNTIL SKILL-FLAG = 0
-               STRING "Skills:" 
+               STRING "Learn a New Skill:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "1) Skill 1" 
+
+               STRING "Skill 1"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "2) Skill 2" 
+
+               STRING "Skill 2"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "3) Skill 3" 
+
+               STRING "Skill 3"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "4) Skill 4" 
+
+               STRING "Skill 4"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "5) Skill 5" 
+
+               STRING "Skill 5"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "6) Go Back" 
+
+               STRING "Go Back"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
-               STRING "Enter your choice:" 
+
+               STRING "Enter your choice:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
-               
+
                PERFORM READ-INPUT
                MOVE IN-LINE TO CHOICE
-               
+
                EVALUATE CHOICE
                    WHEN "1" THRU "5"
                        STRING "This skill is under construction."
@@ -256,7 +267,6 @@
                        MOVE 0 TO SKILL-FLAG
                END-EVALUATE
            END-PERFORM.
-
        COUNT-ACCOUNTS.
            MOVE 0 TO ACCOUNT-COUNT.
            MOVE 0 TO EOF-FLAG.
