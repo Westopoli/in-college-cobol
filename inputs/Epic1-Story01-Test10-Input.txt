@@ -1,0 +1,7 @@
+2
+uppercase
+ABCDEF1!
+1
+uppercase
+ABCDEF1!
+4
