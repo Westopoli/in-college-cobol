@@ -62,11 +62,11 @@
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
                
-               STRING "1) Log In" 
+               STRING "Log In"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
                
-               STRING "2) Create New Account" 
+               STRING "Create New Account"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
                
@@ -92,7 +92,8 @@
        CREATE-ACCOUNT.
            PERFORM COUNT-ACCOUNTS.
            IF ACCOUNT-COUNT >= 5
-               STRING "All permitted accounts have been created."
+               STRING "All permitted accounts have been created, "
+                   "please come back later"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
                EXIT PARAGRAPH
@@ -110,9 +111,16 @@
            PERFORM READ-INPUT.
            MOVE IN-LINE TO PASSWORD.
 
+           IF USERNAME = SPACES
+               STRING "Invalid username, please try again"
+                   DELIMITED BY SIZE INTO OUT-LINE
+               PERFORM WRITE-OUTPUT
+               EXIT PARAGRAPH
+           END-IF.
+
            PERFORM FIND-USERNAME.
            IF FOUND-FLAG = 1
-               STRING "Username is already taken." 
+               STRING "Username already exists, please try again"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
            ELSE
@@ -123,8 +131,9 @@
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM WRITE-OUTPUT
                ELSE
-                   STRING "Password rejected - must be 8-12 chars,"
-                       " uppercase, digit, and special char."
+                   STRING "Invalid password: must be 8-12 "
+                       "characters and include an uppercase "
+                       "letter, a digit, and a special character."
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM WRITE-OUTPUT
                END-IF
