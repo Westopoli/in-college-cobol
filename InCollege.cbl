@@ -51,6 +51,9 @@
        MAIN.
            OPEN INPUT INPUT-FILE.
            OPEN OUTPUT OUTPUT-FILE.
+           STRING "Welcome to InCollege!" 
+                DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM WRITE-OUTPUT
            PERFORM MENU-CYCLE.
            CLOSE INPUT-FILE.
            CLOSE OUTPUT-FILE.
@@ -58,10 +61,6 @@
 
        MENU-CYCLE.
            PERFORM UNTIL SESSION-FLAG = 0
-               STRING "Welcome to InCollege!" 
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-               
                STRING "Log In"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM WRITE-OUTPUT
@@ -85,6 +84,10 @@
                    WHEN OTHER
                        IF IN-LINE = "logout"
                            MOVE 0 TO SESSION-FLAG
+                       ELSE
+                           STRING "Invalid choice, please try again"
+                               DELIMITED BY SIZE INTO OUT-LINE
+                           PERFORM WRITE-OUTPUT
                        END-IF
                END-EVALUATE
            END-PERFORM.
@@ -226,6 +229,10 @@
                        PERFORM SKILL-MENU
                    WHEN "4"
                        MOVE 0 TO SESSION-FLAG
+                   WHEN OTHER
+                       STRING "Invalid choice, please try again"
+                           DELIMITED BY SIZE INTO OUT-LINE
+                       PERFORM WRITE-OUTPUT
                END-EVALUATE
            END-PERFORM.
 
@@ -274,6 +281,10 @@
                        PERFORM WRITE-OUTPUT
                    WHEN "6"
                        MOVE 0 TO SKILL-FLAG
+                   WHEN OTHER
+                       STRING "Invalid choice, please try again"
+                           DELIMITED BY SIZE INTO OUT-LINE
+                       PERFORM WRITE-OUTPUT
                END-EVALUATE
            END-PERFORM.
        COUNT-ACCOUNTS.
