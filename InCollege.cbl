@@ -15,7 +15,7 @@
        DATA DIVISION.
        FILE SECTION.
        FD INPUT-FILE.
-       01 INPUT-RECORD PIC X(100).
+       01 INPUT-RECORD PIC X(256).
 
        FD ACCOUNTS-FILE.
        01 ACCOUNT-RECORD.
@@ -23,22 +23,27 @@
            05 ACCOUNT-PASSWORD PIC X(20).
 
        FD OUTPUT-FILE.
-       01 OUTPUT-RECORD PIC X(100).
+       01 OUTPUT-RECORD PIC X(256).
 
        WORKING-STORAGE SECTION.
-       01 OUT-LINE PIC X(100) VALUE SPACES.
-       01 IN-LINE PIC X(100).
+       01 OUT-LINE PIC X(256) VALUE SPACES.
+       01 IN-LINE PIC X(256).
        01 USERNAME PIC X(20).
        01 PASSWORD PIC X(20).
+       01 CURRENT-USER PIC X(20) VALUE SPACES.
        01 CHOICE PIC X(1).
        01 FOUND-FLAG PIC 9 VALUE 0.
        01 FOUND-PASSWORD PIC X(20).
-       01 ACCOUNT-COUNT PIC 99 VALUE 0.
+       78 MAX-USERS VALUE 5.
+       01 USER-TABLE.
+           05 USER-ENTRY OCCURS MAX-USERS TIMES.
+               10 UT-USERNAME PIC X(20).
+               10 UT-PASSWORD PIC X(20).
+       01 UT-COUNT PIC 99 VALUE 0.
+       01 ACC-EOF PIC 9 VALUE 0.
        01 VALID-FLAG PIC 9 VALUE 0.
-       01 SESSION-FLAG PIC 9 VALUE 1.
-       01 SKILL-FLAG PIC 9 VALUE 0.
-       01 LOGIN-FLAG PIC 9 VALUE 0.
-       01 EOF-FLAG PIC 9 VALUE 0.
+       01 LOGIN-OK PIC 9 VALUE 0.
+       01 SCREEN-CODE PIC 99 VALUE 1.
        01 ACC-STATUS PIC XX VALUE "00".
        01 PASS-LENGTH PIC 99.
        01 HAS-CAPITAL PIC 9 VALUE 0.
@@ -47,287 +52,278 @@
        01 I PIC 999.
        01 CHAR-CODE PIC 999.
 
+      *> Sections below are grouping headers only, one per paragraph
+      *> prefix (MAIN-, NAV-, ACCT-, STORE-, IO-). Every PERFORM targets
+      *> a paragraph name, never a section name - PERFORM <section-name>
+      *> would run every paragraph in that section with fall-through.
        PROCEDURE DIVISION.
+
+       MAIN-SECTION SECTION.
        MAIN.
-           OPEN INPUT INPUT-FILE.
-           OPEN OUTPUT OUTPUT-FILE.
-           STRING "Welcome to InCollege!" 
+           PERFORM IO-OPEN-FILES.
+           PERFORM STORE-LOAD-ALL.
+           STRING "Welcome to InCollege!"
                 DELIMITED BY SIZE INTO OUT-LINE
-           PERFORM WRITE-OUTPUT
-           PERFORM MENU-CYCLE.
-           CLOSE INPUT-FILE.
-           CLOSE OUTPUT-FILE.
-           STOP RUN.
+           PERFORM IO-WRITE-LINE
+           MOVE 1 TO SCREEN-CODE
+           PERFORM NAV-DISPATCH UNTIL SCREEN-CODE = 0.
+           PERFORM IO-TERMINATE.
 
-       MENU-CYCLE.
-           PERFORM UNTIL SESSION-FLAG = 0
-               STRING "Log In"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-               
-               STRING "Create New Account"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-               
-               STRING "Enter your choice:" 
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-               
-               PERFORM READ-INPUT
-               MOVE IN-LINE TO CHOICE
-               
-               EVALUATE CHOICE
-                   WHEN "1"
-                       PERFORM LOGIN
-                   WHEN "2"
-                       PERFORM CREATE-ACCOUNT
-                   WHEN OTHER
-                       IF IN-LINE = "logout"
-                           MOVE 0 TO SESSION-FLAG
-                       ELSE
-                           STRING "Invalid choice, please try again"
-                               DELIMITED BY SIZE INTO OUT-LINE
-                           PERFORM WRITE-OUTPUT
-                       END-IF
-               END-EVALUATE
-           END-PERFORM.
+       NAV-SECTION SECTION.
+      *> Invariant: one NAV- paragraph is one complete prompt sequence
+      *> as it appears in the expected transcript, not one input line-
+      *> NAV-CREATE-ACCOUNT and NAV-LOGIN read more than one line per
+      *> visit. Splitting on "one read" desyncs the input script.
+       NAV-DISPATCH.
+           EVALUATE SCREEN-CODE
+               WHEN 1
+                   PERFORM NAV-TOP-MENU
+               WHEN 2
+                   PERFORM NAV-CREATE-ACCOUNT
+               WHEN 3
+                   PERFORM NAV-LOGIN
+               WHEN 4
+                   PERFORM NAV-POST-LOGIN-MENU
+               WHEN 5
+                   PERFORM NAV-SKILL-MENU
+               WHEN OTHER
+                   MOVE 0 TO SCREEN-CODE
+           END-EVALUATE.
 
-       CREATE-ACCOUNT.
-           PERFORM COUNT-ACCOUNTS.
-           IF ACCOUNT-COUNT >= 5
+       NAV-TOP-MENU.
+           STRING "Log In"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Create New Account"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Enter your choice:"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-PROMPT-AND-READ
+           MOVE IN-LINE TO CHOICE
+
+           EVALUATE CHOICE
+               WHEN "1"
+                   MOVE 3 TO SCREEN-CODE
+               WHEN "2"
+                   MOVE 2 TO SCREEN-CODE
+               WHEN OTHER
+                   IF IN-LINE = "logout"
+                       MOVE 0 TO SCREEN-CODE
+                   ELSE
+                       STRING "Invalid choice, please try again"
+                           DELIMITED BY SIZE INTO OUT-LINE
+                       PERFORM IO-WRITE-LINE
+                       MOVE 1 TO SCREEN-CODE
+                   END-IF
+           END-EVALUATE.
+
+       NAV-CREATE-ACCOUNT.
+           IF UT-COUNT >= MAX-USERS
                STRING "All permitted accounts have been created, "
                    "please come back later"
                    DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
+               PERFORM IO-WRITE-LINE
+               MOVE 1 TO SCREEN-CODE
                EXIT PARAGRAPH
            END-IF.
 
-           STRING "Please enter your username:" 
+           STRING "Please enter your username:"
                DELIMITED BY SIZE INTO OUT-LINE
-           PERFORM WRITE-OUTPUT.
-           PERFORM READ-INPUT.
+           PERFORM IO-PROMPT-AND-READ.
            MOVE IN-LINE TO USERNAME.
 
-           STRING "Please enter your password:" 
+           STRING "Please enter your password:"
                DELIMITED BY SIZE INTO OUT-LINE
-           PERFORM WRITE-OUTPUT.
-           PERFORM READ-INPUT.
+           PERFORM IO-PROMPT-AND-READ.
            MOVE IN-LINE TO PASSWORD.
 
+           MOVE 1 TO SCREEN-CODE.
+
+           PERFORM ACCT-CREATE.
+
+       NAV-LOGIN.
+           STRING "Please enter your username:"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-PROMPT-AND-READ
+           MOVE IN-LINE TO USERNAME
+
+           IF USERNAME = "logout"
+               MOVE 0 TO SCREEN-CODE
+               EXIT PARAGRAPH
+           END-IF
+
+           STRING "Please enter your password:"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-PROMPT-AND-READ
+           MOVE IN-LINE TO PASSWORD
+
+           PERFORM ACCT-TRY-LOGIN
+           IF LOGIN-OK = 1
+               STRING "You have successfully logged in."
+                   DELIMITED BY SIZE INTO OUT-LINE
+               PERFORM IO-WRITE-LINE
+
+               STRING "Welcome, " FUNCTION TRIM(CURRENT-USER) "!"
+                   DELIMITED BY SIZE INTO OUT-LINE
+               PERFORM IO-WRITE-LINE
+
+               MOVE 4 TO SCREEN-CODE
+           ELSE
+               STRING "Incorrect username/password, "
+                   DELIMITED BY SIZE
+                   "please try again"
+                   DELIMITED BY SIZE
+                   INTO OUT-LINE
+               PERFORM IO-WRITE-LINE
+               MOVE 3 TO SCREEN-CODE
+           END-IF.
+
+       NAV-POST-LOGIN-MENU.
+           STRING "1. Search for a job"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "2. Find someone you know"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "3. Learn a new skill"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "4. Log out"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Enter your choice:"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-PROMPT-AND-READ
+           MOVE IN-LINE TO CHOICE
+
+           EVALUATE CHOICE
+               WHEN "1"
+                   STRING "Job search/internship is under "
+                       DELIMITED BY SIZE
+                       "construction."
+                       DELIMITED BY SIZE
+                       INTO OUT-LINE
+                   PERFORM IO-WRITE-LINE
+                   MOVE 4 TO SCREEN-CODE
+               WHEN "2"
+                   STRING "Find someone you know is under "
+                       DELIMITED BY SIZE
+                       "construction."
+                       DELIMITED BY SIZE
+                       INTO OUT-LINE
+                   PERFORM IO-WRITE-LINE
+                   MOVE 4 TO SCREEN-CODE
+               WHEN "3"
+                   MOVE 5 TO SCREEN-CODE
+               WHEN "4"
+                   MOVE 0 TO SCREEN-CODE
+               WHEN OTHER
+                   STRING "Invalid choice, please try again"
+                       DELIMITED BY SIZE INTO OUT-LINE
+                   PERFORM IO-WRITE-LINE
+                   MOVE 4 TO SCREEN-CODE
+           END-EVALUATE.
+
+       NAV-SKILL-MENU.
+           STRING "Learn a New Skill:"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Skill 1"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Skill 2"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Skill 3"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Skill 4"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Skill 5"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Go Back"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-WRITE-LINE
+
+           STRING "Enter your choice:"
+               DELIMITED BY SIZE INTO OUT-LINE
+           PERFORM IO-PROMPT-AND-READ
+           MOVE IN-LINE TO CHOICE
+
+           EVALUATE CHOICE
+               WHEN "1" THRU "5"
+                   STRING "This skill is under construction."
+                       DELIMITED BY SIZE INTO OUT-LINE
+                   PERFORM IO-WRITE-LINE
+                   MOVE 5 TO SCREEN-CODE
+               WHEN "6"
+                   MOVE 4 TO SCREEN-CODE
+               WHEN OTHER
+                   STRING "Invalid choice, please try again"
+                       DELIMITED BY SIZE INTO OUT-LINE
+                   PERFORM IO-WRITE-LINE
+                   MOVE 5 TO SCREEN-CODE
+           END-EVALUATE.
+
+       ACCT-SECTION SECTION.
+       ACCT-CREATE.
            IF USERNAME = SPACES
                STRING "Invalid username, please try again"
                    DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
+               PERFORM IO-WRITE-LINE
                EXIT PARAGRAPH
            END-IF.
 
-           PERFORM FIND-USERNAME.
+           PERFORM STORE-FIND.
            IF FOUND-FLAG = 1
                STRING "Username already exists, please try again"
                    DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
+               PERFORM IO-WRITE-LINE
            ELSE
-               PERFORM VALIDATE-PASSWORD
+               PERFORM ACCT-VALIDATE-PASSWORD
                IF VALID-FLAG = 1
-                   PERFORM SAVE-ACCOUNT
-                   STRING "Account created successfully." 
+                   PERFORM STORE-ADD
+                   STRING "Account created successfully."
                        DELIMITED BY SIZE INTO OUT-LINE
-                   PERFORM WRITE-OUTPUT
+                   PERFORM IO-WRITE-LINE
                ELSE
                    STRING "Invalid password: must be 8-12 "
                        "characters and include an uppercase "
                        "letter, a digit, and a special character."
                        DELIMITED BY SIZE INTO OUT-LINE
-                   PERFORM WRITE-OUTPUT
+                   PERFORM IO-WRITE-LINE
                END-IF
            END-IF.
 
-       LOGIN.
-           MOVE 0 TO LOGIN-FLAG.
-           PERFORM UNTIL LOGIN-FLAG = 1
-               STRING "Please enter your username:"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-               PERFORM READ-INPUT
-               MOVE IN-LINE TO USERNAME
-
-               IF USERNAME = "logout"
-                   MOVE 0 TO SESSION-FLAG
-                   EXIT PARAGRAPH
-               END-IF
-
-               STRING "Please enter your password:"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-               PERFORM READ-INPUT
-               MOVE IN-LINE TO PASSWORD
-
-               PERFORM FIND-USERNAME
-               IF FOUND-FLAG = 1 AND FOUND-PASSWORD = PASSWORD
-                   STRING "You have successfully logged in."
-                       DELIMITED BY SIZE INTO OUT-LINE
-                   PERFORM WRITE-OUTPUT
-
-                   STRING "Welcome, " FUNCTION TRIM(USERNAME) "!"
-                       DELIMITED BY SIZE INTO OUT-LINE
-                   PERFORM WRITE-OUTPUT
-
-                   MOVE 1 TO LOGIN-FLAG
-                   PERFORM POST-LOGIN-MENU
-               ELSE
-                   STRING "Incorrect username/password, "
-                       DELIMITED BY SIZE
-                       "please try again"
-                       DELIMITED BY SIZE
-                       INTO OUT-LINE
-                   PERFORM WRITE-OUTPUT
-               END-IF
-           END-PERFORM.
-
-       POST-LOGIN-MENU.
-           MOVE 1 TO SESSION-FLAG.
-           PERFORM UNTIL SESSION-FLAG = 0
-               STRING "1. Search for a job"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "2. Find someone you know"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "3. Learn a new skill"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "4. Log out"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Enter your choice:"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               PERFORM READ-INPUT
-               MOVE IN-LINE TO CHOICE
-
-               EVALUATE CHOICE
-                   WHEN "1"
-                       STRING "Job search/internship is under "
-                           DELIMITED BY SIZE
-                           "construction."
-                           DELIMITED BY SIZE
-                           INTO OUT-LINE
-                       PERFORM WRITE-OUTPUT
-                   WHEN "2"
-                       STRING "Find someone you know is under "
-                           DELIMITED BY SIZE
-                           "construction."
-                           DELIMITED BY SIZE
-                           INTO OUT-LINE
-                       PERFORM WRITE-OUTPUT
-                   WHEN "3"
-                       PERFORM SKILL-MENU
-                   WHEN "4"
-                       MOVE 0 TO SESSION-FLAG
-                   WHEN OTHER
-                       STRING "Invalid choice, please try again"
-                           DELIMITED BY SIZE INTO OUT-LINE
-                       PERFORM WRITE-OUTPUT
-               END-EVALUATE
-           END-PERFORM.
-
-       SKILL-MENU.
-           MOVE 1 TO SKILL-FLAG.
-           PERFORM UNTIL SKILL-FLAG = 0
-               STRING "Learn a New Skill:"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Skill 1"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Skill 2"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Skill 3"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Skill 4"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Skill 5"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Go Back"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               STRING "Enter your choice:"
-                   DELIMITED BY SIZE INTO OUT-LINE
-               PERFORM WRITE-OUTPUT
-
-               PERFORM READ-INPUT
-               MOVE IN-LINE TO CHOICE
-
-               EVALUATE CHOICE
-                   WHEN "1" THRU "5"
-                       STRING "This skill is under construction."
-                           DELIMITED BY SIZE INTO OUT-LINE
-                       PERFORM WRITE-OUTPUT
-                   WHEN "6"
-                       MOVE 0 TO SKILL-FLAG
-                   WHEN OTHER
-                       STRING "Invalid choice, please try again"
-                           DELIMITED BY SIZE INTO OUT-LINE
-                       PERFORM WRITE-OUTPUT
-               END-EVALUATE
-           END-PERFORM.
-       COUNT-ACCOUNTS.
-           MOVE 0 TO ACCOUNT-COUNT.
-           MOVE 0 TO EOF-FLAG.
-           OPEN INPUT ACCOUNTS-FILE.
-           IF ACC-STATUS NOT = "00"
-               EXIT PARAGRAPH
+       ACCT-TRY-LOGIN.
+           MOVE 0 TO LOGIN-OK.
+           PERFORM STORE-FIND.
+           IF FOUND-FLAG = 1 AND FOUND-PASSWORD = PASSWORD
+               MOVE USERNAME TO CURRENT-USER
+               MOVE 1 TO LOGIN-OK
            END-IF.
-           PERFORM UNTIL EOF-FLAG = 1
-               READ ACCOUNTS-FILE
-                   AT END MOVE 1 TO EOF-FLAG
-                   NOT AT END ADD 1 TO ACCOUNT-COUNT
-               END-READ
-           END-PERFORM.
-           CLOSE ACCOUNTS-FILE.
 
-       FIND-USERNAME.
-           MOVE 0 TO FOUND-FLAG.
-           MOVE SPACES TO FOUND-PASSWORD.
-           MOVE 0 TO EOF-FLAG.
-           OPEN INPUT ACCOUNTS-FILE.
-           IF ACC-STATUS NOT = "00"
-               EXIT PARAGRAPH
-           END-IF.
-           PERFORM UNTIL EOF-FLAG = 1
-               READ ACCOUNTS-FILE
-                   AT END MOVE 1 TO EOF-FLAG
-                   NOT AT END
-                       IF ACCOUNT-USERNAME = USERNAME
-                           MOVE 1 TO FOUND-FLAG
-                           MOVE ACCOUNT-PASSWORD TO FOUND-PASSWORD
-                       END-IF
-               END-READ
-           END-PERFORM.
-           CLOSE ACCOUNTS-FILE.
-
-       VALIDATE-PASSWORD.
+       ACCT-VALIDATE-PASSWORD.
            MOVE 0 TO VALID-FLAG.
            MOVE 0 TO HAS-CAPITAL.
            MOVE 0 TO HAS-DIGIT.
            MOVE 0 TO HAS-SPECIAL.
-           MOVE FUNCTION LENGTH(FUNCTION TRIM(PASSWORD)) 
+           MOVE FUNCTION LENGTH(FUNCTION TRIM(PASSWORD))
                TO PASS-LENGTH.
 
            IF PASS-LENGTH < 8 OR PASS-LENGTH > 12
@@ -337,15 +333,15 @@
            PERFORM VARYING I FROM 1 BY 1
                UNTIL I > PASS-LENGTH
                MOVE FUNCTION ORD(PASSWORD(I:1)) TO CHAR-CODE
-               
+
                IF CHAR-CODE >= 65 AND CHAR-CODE <= 90
                    MOVE 1 TO HAS-CAPITAL
                END-IF
-               
+
                IF CHAR-CODE >= 48 AND CHAR-CODE <= 57
                    MOVE 1 TO HAS-DIGIT
                END-IF
-               
+
                IF (CHAR-CODE >= 33 AND CHAR-CODE <= 47) OR
                   (CHAR-CODE >= 58 AND CHAR-CODE <= 64) OR
                   (CHAR-CODE >= 91 AND CHAR-CODE <= 96) OR
@@ -354,34 +350,88 @@
                END-IF
            END-PERFORM.
 
-           IF HAS-CAPITAL = 1 AND HAS-DIGIT = 1 
+           IF HAS-CAPITAL = 1 AND HAS-DIGIT = 1
                AND HAS-SPECIAL = 1
                MOVE 1 TO VALID-FLAG
            END-IF.
 
-       SAVE-ACCOUNT.
-           OPEN EXTEND ACCOUNTS-FILE.
+       STORE-SECTION SECTION.
+       STORE-LOAD-ALL.
+           MOVE 0 TO UT-COUNT.
+           MOVE 0 TO ACC-EOF.
+           OPEN INPUT ACCOUNTS-FILE.
            IF ACC-STATUS NOT = "00"
-               OPEN OUTPUT ACCOUNTS-FILE
+               EXIT PARAGRAPH
            END-IF.
-           MOVE USERNAME TO ACCOUNT-USERNAME.
-           MOVE PASSWORD TO ACCOUNT-PASSWORD.
-           WRITE ACCOUNT-RECORD.
+           PERFORM UNTIL ACC-EOF = 1
+               READ ACCOUNTS-FILE
+                   AT END MOVE 1 TO ACC-EOF
+                   NOT AT END
+                       IF UT-COUNT < MAX-USERS
+                           ADD 1 TO UT-COUNT
+                           MOVE ACCOUNT-USERNAME
+                               TO UT-USERNAME(UT-COUNT)
+                           MOVE ACCOUNT-PASSWORD
+                               TO UT-PASSWORD(UT-COUNT)
+                       END-IF
+               END-READ
+           END-PERFORM.
            CLOSE ACCOUNTS-FILE.
 
-       READ-INPUT.
+       STORE-FIND.
+           MOVE 0 TO FOUND-FLAG.
+           MOVE SPACES TO FOUND-PASSWORD.
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > UT-COUNT
+               IF UT-USERNAME(I) = USERNAME
+                   MOVE 1 TO FOUND-FLAG
+                   MOVE UT-PASSWORD(I) TO FOUND-PASSWORD
+               END-IF
+           END-PERFORM.
+
+       STORE-ADD.
+           ADD 1 TO UT-COUNT.
+           MOVE USERNAME TO UT-USERNAME(UT-COUNT).
+           MOVE PASSWORD TO UT-PASSWORD(UT-COUNT).
+
+       STORE-FLUSH-ALL.
+           IF UT-COUNT > 0
+               OPEN OUTPUT ACCOUNTS-FILE
+               IF ACC-STATUS = "00"
+                   PERFORM VARYING I FROM 1 BY 1 UNTIL I > UT-COUNT
+                       MOVE UT-USERNAME(I) TO ACCOUNT-USERNAME
+                       MOVE UT-PASSWORD(I) TO ACCOUNT-PASSWORD
+                       WRITE ACCOUNT-RECORD
+                   END-PERFORM
+                   CLOSE ACCOUNTS-FILE
+               END-IF
+           END-IF.
+
+       IO-SECTION SECTION.
+       IO-READ-LINE.
            READ INPUT-FILE
                AT END
-                   CLOSE INPUT-FILE
-                   CLOSE OUTPUT-FILE
-                   STOP RUN
+                   PERFORM IO-TERMINATE
                NOT AT END
                    MOVE INPUT-RECORD TO IN-LINE
                    MOVE IN-LINE TO OUT-LINE
-                   PERFORM WRITE-OUTPUT
+                   PERFORM IO-WRITE-LINE
            END-READ.
 
-       WRITE-OUTPUT.
+       IO-WRITE-LINE.
            DISPLAY FUNCTION TRIM(OUT-LINE TRAILING).
            WRITE OUTPUT-RECORD FROM OUT-LINE.
            MOVE SPACES TO OUT-LINE.
+
+       IO-PROMPT-AND-READ.
+           PERFORM IO-WRITE-LINE
+           PERFORM IO-READ-LINE.
+
+       IO-OPEN-FILES.
+           OPEN INPUT INPUT-FILE.
+           OPEN OUTPUT OUTPUT-FILE.
+
+       IO-TERMINATE.
+           PERFORM STORE-FLUSH-ALL.
+           CLOSE INPUT-FILE.
+           CLOSE OUTPUT-FILE.
+           STOP RUN.
