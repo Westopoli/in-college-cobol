@@ -98,13 +98,14 @@
                   ".txt" DELIMITED SIZE
                INTO EXP-NAME
 
-      *> reset the account store before a normal test or a PhaseA
+      *> reset the accounts and profiles before a normal test or a PhaseA
            MOVE 0 TO PH-CNT
            MOVE 0 TO PHA-CNT
            INSPECT NAME-PART TALLYING PH-CNT FOR ALL "-Phase"
            INSPECT NAME-PART TALLYING PHA-CNT FOR ALL "-PhaseA"
            IF PH-CNT = 0 OR PHA-CNT > 0
                CALL "SYSTEM" USING "rm -f accounts.txt"
+               CALL "SYSTEM" USING "rm -f profiles.txt"
            END-IF
 
       *> load this test's input, clear old output, run the program

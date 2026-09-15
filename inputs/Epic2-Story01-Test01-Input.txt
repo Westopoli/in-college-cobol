@@ -1,0 +1,25 @@
+2
+testuser
+Passw0rd!
+1
+testuser
+Passw0rd!
+1
+Jane
+Doe
+State University
+Computer Science
+2027
+Enthusiastic developer.
+
+Software Intern
+Tech Corp
+Summer 2024
+Built internal tools.
+DONE
+
+Bachelor of Science
+State University
+2021-2025
+DONE
+2

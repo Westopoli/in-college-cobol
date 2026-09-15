@@ -1,0 +1,50 @@
+Welcome to InCollege!
+Log In
+Create New Account
+Enter your choice: 2
+Please enter your username: testuser
+Please enter your password: Passw0rd!
+Account created successfully.
+Log In
+Create New Account
+Enter your choice: 1
+Please enter your username: testuser
+Please enter your password: Passw0rd!
+You have successfully logged in.
+Welcome, testuser!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 1
+--- Create/Edit Profile ---
+Enter First Name: Grace
+Enter Last Name: Hopper
+Enter University/College Attended: Yale
+Enter Major: Mathematics
+Enter Graduation Year (YYYY): 2034
+Graduation Year must be between 2026 and 2033.
+Enter Graduation Year (YYYY): 2033
+Enter About Me (optional, max 200 chars, enter blank line to skip):
+Add Experience (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Add Education (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Profile saved successfully!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 2
+--- Your Profile ---
+Name: Grace Hopper
+University: Yale
+Major: Mathematics
+Graduation Year: 2033
+--------------------
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice:

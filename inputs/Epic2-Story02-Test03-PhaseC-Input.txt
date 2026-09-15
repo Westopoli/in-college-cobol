@@ -1,0 +1,21 @@
+1
+alice
+Passw0rd!
+1
+Alicia
+Anders
+Gamma University
+Data Science
+2030
+Alice UPDATED bio.
+
+Senior Dev
+Globex
+2024
+Alice new work.
+DONE
+
+M.S. DS
+Gamma University
+2023-2025
+DONE
