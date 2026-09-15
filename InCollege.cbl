@@ -94,28 +94,6 @@
                        20 PT-EDU-UNIVERSITY PIC X(60).
                        20 PT-EDU-YEARS PIC X(30).
 
-       01 PROFILE-WORK.
-           05 W-USERNAME PIC X(20).
-           05 W-FIRST-NAME PIC X(30).
-           05 W-LAST-NAME PIC X(30).
-           05 W-UNIVERSITY PIC X(60).
-           05 W-MAJOR PIC X(50).
-           05 W-GRAD-YEAR PIC X(4).
-           05 W-ABOUT-ME PIC X(200).
-           05 W-EXP-COUNT PIC 9.
-           05 W-EXP-TABLE.
-               10 W-EXP-ENTRY OCCURS 3 TIMES.
-                   15 W-EXP-TITLE PIC X(50).
-                   15 W-EXP-COMPANY PIC X(60).
-                   15 W-EXP-DATES PIC X(40).
-                   15 W-EXP-DESC PIC X(100).
-           05 W-EDU-COUNT PIC 9.
-           05 W-EDU-TABLE.
-               10 W-EDU-ENTRY OCCURS 3 TIMES.
-                   15 W-EDU-DEGREE PIC X(50).
-                   15 W-EDU-UNIVERSITY PIC X(60).
-                   15 W-EDU-YEARS PIC X(30).
-
        01 PT-COUNT PIC 99 VALUE 0.
        01 PROFILE-EOF PIC 9 VALUE 0.
        01 PROFILE-STATUS PIC XX VALUE "00".
@@ -370,14 +348,22 @@
       *> Create and edit use the same flow. If a profile exists, it is
       *> loaded first and then replaced by the new values from the file.
        NAV-PROFILE-EDIT.
+      *> Resolve which table row this is FIRST - existing row if the
+      *> user already has a profile, a freshly appended one if not.
+      *> Every PROFILE-READ-* paragraph below writes straight into
+      *> that row; there is no scratch copy (removed - see
+      *> STORE-FIND-PROFILE's one call here plus the guard below,
+      *> same shape STORE-SAVE-PROFILE used to have).
            PERFORM STORE-FIND-PROFILE
 
-           IF PROFILE-FOUND = 1
-               MOVE PROFILE-ENTRY(PROFILE-INDEX)
-                   TO PROFILE-WORK
-           ELSE
-               INITIALIZE PROFILE-WORK
-               MOVE CURRENT-USER TO W-USERNAME
+           IF PROFILE-FOUND = 0
+               IF PT-COUNT < MAX-USERS
+                   ADD 1 TO PT-COUNT
+                   MOVE PT-COUNT TO PROFILE-INDEX
+                   MOVE CURRENT-USER TO PT-USERNAME(PROFILE-INDEX)
+               ELSE
+                   EXIT PARAGRAPH
+               END-IF
            END-IF
 
            STRING "--- Create/Edit Profile ---"
@@ -392,9 +378,6 @@
            PERFORM PROFILE-READ-ABOUT-ME
            PERFORM PROFILE-READ-EXPERIENCE
            PERFORM PROFILE-READ-EDUCATION
-
-           MOVE CURRENT-USER TO W-USERNAME
-           PERFORM STORE-SAVE-PROFILE
 
            STRING "Profile saved successfully!"
                DELIMITED BY SIZE INTO OUT-LINE
@@ -413,85 +396,86 @@
                EXIT PARAGRAPH
            END-IF
 
-           MOVE PROFILE-ENTRY(PROFILE-INDEX) TO PROFILE-WORK
-
            STRING "--- Your Profile ---"
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
 
-           STRING "Name: " FUNCTION TRIM(W-FIRST-NAME)
-               " " FUNCTION TRIM(W-LAST-NAME)
+           STRING "Name: " FUNCTION TRIM(PT-FIRST-NAME(PROFILE-INDEX))
+               " " FUNCTION TRIM(PT-LAST-NAME(PROFILE-INDEX))
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
 
-           STRING "University: " FUNCTION TRIM(W-UNIVERSITY)
+           STRING "University: "
+               FUNCTION TRIM(PT-UNIVERSITY(PROFILE-INDEX))
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
 
-           STRING "Major: " FUNCTION TRIM(W-MAJOR)
+           STRING "Major: " FUNCTION TRIM(PT-MAJOR(PROFILE-INDEX))
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
 
-           STRING "Graduation Year: " W-GRAD-YEAR
+           STRING "Graduation Year: " PT-GRAD-YEAR(PROFILE-INDEX)
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
 
-           IF W-ABOUT-ME NOT = SPACES
-               STRING "About Me: " FUNCTION TRIM(W-ABOUT-ME)
+           IF PT-ABOUT-ME(PROFILE-INDEX) NOT = SPACES
+               STRING "About Me: "
+                   FUNCTION TRIM(PT-ABOUT-ME(PROFILE-INDEX))
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-WRITE-LINE
            END-IF
 
-           IF W-EXP-COUNT > 0
+           IF PT-EXP-COUNT(PROFILE-INDEX) > 0
                STRING "Experience:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-WRITE-LINE
 
                PERFORM VARYING I FROM 1 BY 1
-                   UNTIL I > W-EXP-COUNT
+                   UNTIL I > PT-EXP-COUNT(PROFILE-INDEX)
                    STRING " Title: "
-                       FUNCTION TRIM(W-EXP-TITLE(I))
+                       FUNCTION TRIM(PT-EXP-TITLE(PROFILE-INDEX, I))
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
 
                    STRING " Company: "
-                       FUNCTION TRIM(W-EXP-COMPANY(I))
+                       FUNCTION TRIM(PT-EXP-COMPANY(PROFILE-INDEX, I))
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
 
                    STRING " Dates: "
-                       FUNCTION TRIM(W-EXP-DATES(I))
+                       FUNCTION TRIM(PT-EXP-DATES(PROFILE-INDEX, I))
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
 
-                   IF W-EXP-DESC(I) NOT = SPACES
+                   IF PT-EXP-DESC(PROFILE-INDEX, I) NOT = SPACES
                        STRING " Description: "
-                           FUNCTION TRIM(W-EXP-DESC(I))
+                           FUNCTION TRIM(PT-EXP-DESC(PROFILE-INDEX, I))
                            DELIMITED BY SIZE INTO OUT-LINE
                        PERFORM IO-WRITE-LINE
                    END-IF
                END-PERFORM
            END-IF
 
-           IF W-EDU-COUNT > 0
+           IF PT-EDU-COUNT(PROFILE-INDEX) > 0
                STRING "Education:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-WRITE-LINE
 
                PERFORM VARYING I FROM 1 BY 1
-                   UNTIL I > W-EDU-COUNT
+                   UNTIL I > PT-EDU-COUNT(PROFILE-INDEX)
                    STRING " Degree: "
-                       FUNCTION TRIM(W-EDU-DEGREE(I))
+                       FUNCTION TRIM(PT-EDU-DEGREE(PROFILE-INDEX, I))
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
 
                    STRING " University: "
-                       FUNCTION TRIM(W-EDU-UNIVERSITY(I))
+                       FUNCTION TRIM(
+                           PT-EDU-UNIVERSITY(PROFILE-INDEX, I))
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
 
                    STRING " Years: "
-                       FUNCTION TRIM(W-EDU-YEARS(I))
+                       FUNCTION TRIM(PT-EDU-YEARS(PROFILE-INDEX, I))
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
                END-PERFORM
@@ -516,7 +500,7 @@
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
                ELSE
-                   MOVE IN-LINE TO W-FIRST-NAME
+                   MOVE IN-LINE TO PT-FIRST-NAME(PROFILE-INDEX)
                    MOVE 1 TO PROFILE-VALID
                END-IF
            END-PERFORM.
@@ -533,7 +517,7 @@
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
                ELSE
-                   MOVE IN-LINE TO W-LAST-NAME
+                   MOVE IN-LINE TO PT-LAST-NAME(PROFILE-INDEX)
                    MOVE 1 TO PROFILE-VALID
                END-IF
            END-PERFORM.
@@ -551,7 +535,7 @@
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
                ELSE
-                   MOVE IN-LINE TO W-UNIVERSITY
+                   MOVE IN-LINE TO PT-UNIVERSITY(PROFILE-INDEX)
                    MOVE 1 TO PROFILE-VALID
                END-IF
            END-PERFORM.
@@ -568,7 +552,7 @@
                        DELIMITED BY SIZE INTO OUT-LINE
                    PERFORM IO-WRITE-LINE
                ELSE
-                   MOVE IN-LINE TO W-MAJOR
+                   MOVE IN-LINE TO PT-MAJOR(PROFILE-INDEX)
                    MOVE 1 TO PROFILE-VALID
                END-IF
            END-PERFORM.
@@ -586,7 +570,7 @@
 
                    IF GRAD-YEAR-NUM >= 2026
                        AND GRAD-YEAR-NUM <= 2033
-                       MOVE IN-LINE(1:4) TO W-GRAD-YEAR
+                       MOVE IN-LINE(1:4) TO PT-GRAD-YEAR(PROFILE-INDEX)
                        MOVE 1 TO PROFILE-VALID
                    ELSE
                        STRING "Graduation Year must be between "
@@ -611,7 +595,7 @@
                PERFORM IO-PROMPT-AND-READ
 
                IF FUNCTION LENGTH(FUNCTION TRIM(IN-LINE)) <= 200
-                   MOVE IN-LINE(1:200) TO W-ABOUT-ME
+                   MOVE IN-LINE(1:200) TO PT-ABOUT-ME(PROFILE-INDEX)
                    MOVE 1 TO PROFILE-VALID
                ELSE
                    STRING "About Me must be 200 characters or less."
@@ -621,8 +605,8 @@
            END-PERFORM.
 
        PROFILE-READ-EXPERIENCE.
-           MOVE 0 TO W-EXP-COUNT
-           MOVE SPACES TO W-EXP-TABLE
+           MOVE 0 TO PT-EXP-COUNT(PROFILE-INDEX)
+           MOVE SPACES TO PT-EXP-TABLE(PROFILE-INDEX)
            MOVE 0 TO ENTRY-NUM
 
            PERFORM UNTIL ENTRY-NUM >= 3
@@ -637,36 +621,37 @@
                END-IF
 
                ADD 1 TO ENTRY-NUM
-               MOVE ENTRY-NUM TO W-EXP-COUNT
+               MOVE ENTRY-NUM TO PT-EXP-COUNT(PROFILE-INDEX)
 
                STRING "Experience #" ENTRY-NUM " - Title:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE TO W-EXP-TITLE(ENTRY-NUM)
+               MOVE IN-LINE TO PT-EXP-TITLE(PROFILE-INDEX, ENTRY-NUM)
 
                STRING "Experience #" ENTRY-NUM
                    " - Company/Organization:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE TO W-EXP-COMPANY(ENTRY-NUM)
+               MOVE IN-LINE TO PT-EXP-COMPANY(PROFILE-INDEX, ENTRY-NUM)
 
                STRING "Experience #" ENTRY-NUM
                    " - Dates (e.g., Summer 2024):"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE TO W-EXP-DATES(ENTRY-NUM)
+               MOVE IN-LINE TO PT-EXP-DATES(PROFILE-INDEX, ENTRY-NUM)
 
                STRING "Experience #" ENTRY-NUM
                    " - Description (optional, max 100 chars, "
                    "blank to skip):"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE(1:100) TO W-EXP-DESC(ENTRY-NUM)
+               MOVE IN-LINE(1:100)
+                   TO PT-EXP-DESC(PROFILE-INDEX, ENTRY-NUM)
            END-PERFORM.
 
        PROFILE-READ-EDUCATION.
-           MOVE 0 TO W-EDU-COUNT
-           MOVE SPACES TO W-EDU-TABLE
+           MOVE 0 TO PT-EDU-COUNT(PROFILE-INDEX)
+           MOVE SPACES TO PT-EDU-TABLE(PROFILE-INDEX)
            MOVE 0 TO ENTRY-NUM
 
            PERFORM UNTIL ENTRY-NUM >= 3
@@ -681,24 +666,25 @@
                END-IF
 
                ADD 1 TO ENTRY-NUM
-               MOVE ENTRY-NUM TO W-EDU-COUNT
+               MOVE ENTRY-NUM TO PT-EDU-COUNT(PROFILE-INDEX)
 
                STRING "Education #" ENTRY-NUM " - Degree:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE TO W-EDU-DEGREE(ENTRY-NUM)
+               MOVE IN-LINE TO PT-EDU-DEGREE(PROFILE-INDEX, ENTRY-NUM)
 
                STRING "Education #" ENTRY-NUM
                    " - University/College:"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE TO W-EDU-UNIVERSITY(ENTRY-NUM)
+               MOVE IN-LINE
+                   TO PT-EDU-UNIVERSITY(PROFILE-INDEX, ENTRY-NUM)
 
                STRING "Education #" ENTRY-NUM
                    " - Years Attended (e.g., 2023-2025):"
                    DELIMITED BY SIZE INTO OUT-LINE
                PERFORM IO-PROMPT-AND-READ
-               MOVE IN-LINE TO W-EDU-YEARS(ENTRY-NUM)
+               MOVE IN-LINE TO PT-EDU-YEARS(PROFILE-INDEX, ENTRY-NUM)
            END-PERFORM.
 
        ACCT-SECTION SECTION.
@@ -868,20 +854,6 @@
                    MOVE I TO PROFILE-INDEX
                END-IF
            END-PERFORM.
-
-       STORE-SAVE-PROFILE.
-           PERFORM STORE-FIND-PROFILE
-
-           IF PROFILE-FOUND = 0
-               IF PT-COUNT < MAX-USERS
-                   ADD 1 TO PT-COUNT
-                   MOVE PT-COUNT TO PROFILE-INDEX
-               ELSE
-                   EXIT PARAGRAPH
-               END-IF
-           END-IF
-
-           MOVE PROFILE-WORK TO PROFILE-ENTRY(PROFILE-INDEX).
 
        STORE-FLUSH-PROFILES.
            IF PT-COUNT > 0
