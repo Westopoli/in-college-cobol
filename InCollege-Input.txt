@@ -1,0 +1,40 @@
+2
+alice
+Foobar4Life!
+1
+alice
+Foobar4Life!
+1
+Alice
+Chen
+Riverside State University
+Computer Science
+2027
+Full-stack developer who loves distributed systems.
+add
+Software Intern
+BlueWave Systems
+Summer 2025
+Built internal tooling for the platform team.
+add
+Teaching Assistant
+Riverside State University
+Fall 2025 - Spring 2026
+
+DONE
+add
+Bachelor of Science in Computer Science
+Riverside State University
+2023-2027
+DONE
+2
+1
+Alice
+Chen
+Riverside State University
+Computer Science
+2027
+
+DONE
+DONE
+2
