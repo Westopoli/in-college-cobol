@@ -1,22 +1,22 @@
 Welcome to InCollege!
 Log In
 Create New Account
-Enter your choice:
-Please enter your username:
-Please enter your password:
+Enter your choice: 2
+Please enter your username: backuser
+Please enter your password: Abcdef1!xy
 Account created successfully.
 Log In
 Create New Account
-Enter your choice:
-Please enter your username:
-Please enter your password:
+Enter your choice: 1
+Please enter your username: backuser
+Please enter your password: Abcdef1!xy
 You have successfully logged in.
 Welcome, backuser!
 1. Search for a job
 2. Find someone you know
 3. Learn a new skill
 4. Log out
-Enter your choice:
+Enter your choice: 3
 Learn a New Skill:
 Skill 1
 Skill 2
@@ -24,15 +24,15 @@ Skill 3
 Skill 4
 Skill 5
 Go Back
-Enter your choice:
+Enter your choice: 6
 1. Search for a job
 2. Find someone you know
 3. Learn a new skill
 4. Log out
-Enter your choice:
+Enter your choice: 1
 Job search/internship is under construction.
 1. Search for a job
 2. Find someone you know
 3. Learn a new skill
 4. Log out
-Enter your choice:
+Enter your choice: 4

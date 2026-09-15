@@ -1,13 +1,21 @@
 Welcome to InCollege!
 Log In
 Create New Account
-Enter your choice:
-Please enter your username:
-Please enter your password:
+Enter your choice: 1
+Please enter your username: student3
+Please enter your password: Abcdef1!xy
 You have successfully logged in.
 Welcome, student3!
-1. Search for a job
-2. Find someone you know
-3. Learn a new skill
-4. Log out
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 4
+Find someone you know is under construction.
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
 Enter your choice:

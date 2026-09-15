@@ -1,28 +1,28 @@
 Welcome to InCollege!
 Log In
 Create New Account
-Enter your choice:
-Please enter your username:
-Please enter your password:
+Enter your choice: 2
+Please enter your username: alice
+Please enter your password: Abcdef1!xy
 Account created successfully.
 Log In
 Create New Account
-Enter your choice:
-Please enter your username:
-Please enter your password:
+Enter your choice: 2
+Please enter your username: bob
+Please enter your password: Zyxwvu2!ab
 Account created successfully.
 Log In
 Create New Account
-Enter your choice:
-Please enter your username:
-Please enter your password:
+Enter your choice: 1
+Please enter your username: alice
+Please enter your password: Zyxwvu2!ab
 Incorrect username/password, please try again
-Please enter your username:
-Please enter your password:
+Please enter your username: bob
+Please enter your password: Zyxwvu2!ab
 You have successfully logged in.
 Welcome, bob!
 1. Search for a job
 2. Find someone you know
 3. Learn a new skill
 4. Log out
-Enter your choice:
+Enter your choice: 4
