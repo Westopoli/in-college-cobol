@@ -283,10 +283,6 @@
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
 
-           STRING "6. Log out"
-               DELIMITED BY SIZE INTO OUT-LINE
-           PERFORM IO-WRITE-LINE
-
            STRING "Enter your choice:"
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-PROMPT-AND-READ
@@ -315,8 +311,6 @@
                    MOVE 4 TO SCREEN-CODE
                WHEN "5"
                    MOVE 5 TO SCREEN-CODE
-               WHEN "6"
-                   MOVE 0 TO SCREEN-CODE
                WHEN OTHER
                    STRING "Invalid choice, please try again"
                        DELIMITED BY SIZE INTO OUT-LINE
