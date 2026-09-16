@@ -1,0 +1,83 @@
+Welcome to InCollege!
+Log In
+Create New Account
+Enter your choice: 2
+Please enter your username: expmax
+Please enter your password: Passw0rd!
+Account created successfully.
+Log In
+Create New Account
+Enter your choice: 1
+Please enter your username: expmax
+Please enter your password: Passw0rd!
+You have successfully logged in.
+Welcome, expmax!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 1
+--- Create/Edit Profile ---
+Enter First Name: Max
+Enter Last Name: Experience
+Enter University/College Attended: Boundary University
+Enter Major: Engineering
+Enter Graduation Year (YYYY): 2029
+Enter About Me (optional, max 200 chars, enter blank line to skip):
+Add Experience (optional, max 3 entries. Enter 'DONE' to finish):
+Experience #1 - Title: Exp One
+Experience #1 - Company/Organization: Org One
+Experience #1 - Dates (e.g., Summer 2024): 2023
+Experience #1 - Description (optional, max 100 chars, blank to skip): One.
+Add Experience (optional, max 3 entries. Enter 'DONE' to finish):
+Experience #2 - Title: Exp Two
+Experience #2 - Company/Organization: Org Two
+Experience #2 - Dates (e.g., Summer 2024): 2024
+Experience #2 - Description (optional, max 100 chars, blank to skip): Two.
+Add Experience (optional, max 3 entries. Enter 'DONE' to finish):
+Experience #3 - Title: Exp Three
+Experience #3 - Company/Organization: Org Three
+Experience #3 - Dates (e.g., Summer 2024): 2025
+Experience #3 - Description (optional, max 100 chars, blank to skip): Three.
+Add Education (optional, max 3 entries. Enter 'DONE' to finish): FOURTH-EXPERIENCE-ATTEMPT
+Education #1 - Degree: ShouldNotBeExperienceTitle
+Education #1 - University/College: ShouldNotBeExperienceCompany
+Education #1 - Years Attended (e.g., 2023-2025): ShouldNotBeExperienceDates
+Add Education (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Profile saved successfully!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 2
+--- Your Profile ---
+Name: Max Experience
+University: Boundary University
+Major: Engineering
+Graduation Year: 2029
+Experience:
+ Title: Exp One
+ Company: Org One
+ Dates: 2023
+ Description: One.
+ Title: Exp Two
+ Company: Org Two
+ Dates: 2024
+ Description: Two.
+ Title: Exp Three
+ Company: Org Three
+ Dates: 2025
+ Description: Three.
+Education:
+ Degree: ShouldNotBeExperienceTitle
+ University: ShouldNotBeExperienceCompany
+ Years: ShouldNotBeExperienceDates
+--------------------
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice:

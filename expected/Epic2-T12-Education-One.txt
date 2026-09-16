@@ -1,0 +1,56 @@
+Welcome to InCollege!
+Log In
+Create New Account
+Enter your choice: 2
+Please enter your username: edu1user
+Please enter your password: Passw0rd!
+Account created successfully.
+Log In
+Create New Account
+Enter your choice: 1
+Please enter your username: edu1user
+Please enter your password: Passw0rd!
+You have successfully logged in.
+Welcome, edu1user!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 1
+--- Create/Edit Profile ---
+Enter First Name: Ed
+Enter Last Name: One
+Enter University/College Attended: Test University
+Enter Major: Computer Science
+Enter Graduation Year (YYYY): 2028
+Enter About Me (optional, max 200 chars, enter blank line to skip):
+Add Experience (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Add Education (optional, max 3 entries. Enter 'DONE' to finish):
+Education #1 - Degree: B.S.
+Education #1 - University/College: Test University
+Education #1 - Years Attended (e.g., 2023-2025): 2024-2028
+Add Education (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Profile saved successfully!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 2
+--- Your Profile ---
+Name: Ed One
+University: Test University
+Major: Computer Science
+Graduation Year: 2028
+Education:
+ Degree: B.S.
+ University: Test University
+ Years: 2024-2028
+--------------------
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice:
