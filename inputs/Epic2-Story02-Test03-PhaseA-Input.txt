@@ -1,0 +1,27 @@
+2
+alice
+Passw0rd!
+2
+bob
+Passw0rd!
+1
+alice
+Passw0rd!
+1
+Alice
+Anders
+Alpha University
+Computer Science
+2027
+Alice original bio.
+
+Dev Intern
+Acme
+2023
+Alice work.
+DONE
+
+B.S. CS
+Alpha University
+2019-2023
+DONE

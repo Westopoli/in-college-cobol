@@ -1,0 +1,27 @@
+2
+testuser
+Passw0rd!
+1
+testuser
+Passw0rd!
+1
+Sam
+Lee
+UF
+CS
+2027
+
+DONE
+
+B.S.
+Univ A
+2018-2022
+
+M.S.
+Univ B
+2022-2024
+
+Ph.D.
+Univ C
+2024-2028
+2

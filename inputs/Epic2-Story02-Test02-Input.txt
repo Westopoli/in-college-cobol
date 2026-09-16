@@ -1,0 +1,43 @@
+2
+testuser
+Passw0rd!
+1
+testuser
+Passw0rd!
+1
+Ed
+Iter
+First University
+CS
+2027
+Initial about.
+
+Intern
+Acme
+2023
+Initial desc.
+DONE
+
+B.S.
+First University
+2019-2023
+DONE
+1
+Ed
+Iter
+First University
+CS
+2027
+Initial about.
+
+Senior Engineer
+Globex
+2024
+Updated desc.
+DONE
+
+M.S.
+Second University
+2023-2025
+DONE
+2
