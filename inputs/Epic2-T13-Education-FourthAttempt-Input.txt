@@ -1,0 +1,28 @@
+2
+edumax
+Passw0rd!
+1
+edumax
+Passw0rd!
+1
+Max
+Education
+Boundary University
+Engineering
+2030
+
+DONE
+
+Degree One
+University One
+2018-2020
+
+Degree Two
+University Two
+2020-2022
+
+Degree Three
+University Three
+2022-2024
+FOURTH-EDUCATION-ATTEMPT
+2

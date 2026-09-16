@@ -1,0 +1,63 @@
+Welcome to InCollege!
+Log In
+Create New Account
+Enter your choice: 2
+Please enter your username: edu2user
+Please enter your password: Passw0rd!
+Account created successfully.
+Log In
+Create New Account
+Enter your choice: 1
+Please enter your username: edu2user
+Please enter your password: Passw0rd!
+You have successfully logged in.
+Welcome, edu2user!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 1
+--- Create/Edit Profile ---
+Enter First Name: Ed
+Enter Last Name: Two
+Enter University/College Attended: Test University
+Enter Major: Information Systems
+Enter Graduation Year (YYYY): 2029
+Enter About Me (optional, max 200 chars, enter blank line to skip):
+Add Experience (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Add Education (optional, max 3 entries. Enter 'DONE' to finish):
+Education #1 - Degree: A.A.
+Education #1 - University/College: Community College
+Education #1 - Years Attended (e.g., 2023-2025): 2020-2022
+Add Education (optional, max 3 entries. Enter 'DONE' to finish):
+Education #2 - Degree: B.S.
+Education #2 - University/College: Test University
+Education #2 - Years Attended (e.g., 2023-2025): 2022-2026
+Add Education (optional, max 3 entries. Enter 'DONE' to finish): DONE
+Profile saved successfully!
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice: 2
+--- Your Profile ---
+Name: Ed Two
+University: Test University
+Major: Information Systems
+Graduation Year: 2029
+Education:
+ Degree: A.A.
+ University: Community College
+ Years: 2020-2022
+ Degree: B.S.
+ University: Test University
+ Years: 2022-2026
+--------------------
+1. Create/Edit My Profile
+2. View My Profile
+3. Search for a job
+4. Find someone you know
+5. Learn a New Skill
+Enter your choice:

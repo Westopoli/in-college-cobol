@@ -101,6 +101,7 @@
        01 PROFILE-FOUND PIC 9 VALUE 0.
        01 PROFILE-INDEX PIC 99 VALUE 0.
        01 PROFILE-VALID PIC 9 VALUE 0.
+       01 PROFILE-EDIT-ACTIVE PIC 9 VALUE 0.
        01 GRAD-YEAR-NUM PIC 9(4) VALUE 0.
        01 ENTRY-NUM PIC 9 VALUE 0.
 
@@ -367,6 +368,8 @@
                END-IF
            END-IF
 
+           MOVE 1 TO PROFILE-EDIT-ACTIVE
+
            STRING "--- Create/Edit Profile ---"
                DELIMITED BY SIZE INTO OUT-LINE
            PERFORM IO-WRITE-LINE
@@ -379,6 +382,9 @@
            PERFORM PROFILE-READ-ABOUT-ME
            PERFORM PROFILE-READ-EXPERIENCE
            PERFORM PROFILE-READ-EDUCATION
+
+           MOVE 0 TO PROFILE-EDIT-ACTIVE
+           PERFORM STORE-FLUSH-PROFILES
 
            STRING "Profile saved successfully!"
                DELIMITED BY SIZE INTO OUT-LINE
@@ -881,6 +887,8 @@
        IO-READ-LINE.
            READ INPUT-FILE
                AT END
+                   MOVE PROMPT-TEXT TO OUT-LINE
+                   PERFORM IO-WRITE-LINE
                    PERFORM IO-TERMINATE
                NOT AT END
                    MOVE INPUT-RECORD TO IN-LINE
@@ -901,7 +909,9 @@
 
        IO-TERMINATE.
            PERFORM STORE-FLUSH-ALL
-           PERFORM STORE-FLUSH-PROFILES
+           IF PROFILE-EDIT-ACTIVE = 0
+               PERFORM STORE-FLUSH-PROFILES
+           END-IF
            CLOSE INPUT-FILE
            CLOSE OUTPUT-FILE
            STOP RUN.

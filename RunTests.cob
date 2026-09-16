@@ -44,6 +44,7 @@
        01 GOT-N           PIC 9(4).
        01 EXP-N           PIC 9(4).
        01 MATCH-FLAG      PIC 9.
+       01 IO-MATCH-FLAG   PIC 9 VALUE 1.
        01 PASS-DSP        PIC ZZZ9.
        01 FAIL-DSP        PIC ZZZ9.
        01 MISS-DSP        PIC ZZZ9.
@@ -118,6 +119,24 @@
            CALL "SYSTEM" USING "rm -f InCollege-Output.txt"
            CALL "SYSTEM" USING "timeout 10 ./incollege > .got.tmp 2>&1"
 
+      *> Epic 2 T17: console and output file must be byte-identical.
+           MOVE 1 TO IO-MATCH-FLAG
+           CALL "SYSTEM" USING
+               "cmp -s .got.tmp InCollege-Output.txt"
+           IF RETURN-CODE NOT = 0
+               MOVE 0 TO IO-MATCH-FLAG
+               MOVE SPACES TO CMD
+               STRING "diff -u .got.tmp InCollege-Output.txt > "
+                      "'results/"
+                      FUNCTION TRIM(NAME-PART)
+                      "-console-vs-output.diff' 2>&1"
+                   DELIMITED BY SIZE INTO CMD
+               CALL "SYSTEM" USING CMD
+               DISPLAY "IO FAIL  " FUNCTION TRIM(NAME-PART)
+           ELSE
+               DISPLAY "IO PASS  " FUNCTION TRIM(NAME-PART)
+           END-IF
+
            PERFORM LOAD-GOT
            PERFORM LOAD-EXP
            PERFORM COMPARE.
@@ -185,6 +204,9 @@
                        MOVE 0 TO MATCH-FLAG
                    END-IF
                END-PERFORM
+           END-IF
+           IF IO-MATCH-FLAG = 0
+               MOVE 0 TO MATCH-FLAG
            END-IF
            IF MATCH-FLAG = 1
                ADD 1 TO PASS-CNT
