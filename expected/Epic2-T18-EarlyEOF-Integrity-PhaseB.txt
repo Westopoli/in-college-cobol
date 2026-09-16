@@ -14,3 +14,4 @@ Welcome, eofuser!
 Enter your choice: 1
 --- Create/Edit Profile ---
 Enter First Name: Corrupted
+Enter Last Name:
